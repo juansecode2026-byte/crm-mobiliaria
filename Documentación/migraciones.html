@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Migraciones — CRM Mobiliaria</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: #0f172a;
+      color: #e2e8f0;
+      min-height: 100vh;
+    }
+
+    /* ── NAV ── */
+    nav {
+      background: #1e293b;
+      border-bottom: 1px solid #334155;
+      padding: 0 2rem;
+      display: flex;
+      align-items: center;
+      gap: 2rem;
+      height: 60px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .nav-logo {
+      font-size: 1rem;
+      font-weight: 700;
+      color: #3b82f6;
+      letter-spacing: -0.3px;
+      white-space: nowrap;
+    }
+
+    .nav-tabs {
+      display: flex;
+      gap: 0.25rem;
+      margin-left: auto;
+    }
+
+    .tab-btn {
+      padding: 0.4rem 1.1rem;
+      border-radius: 6px;
+      border: none;
+      cursor: pointer;
+      font-size: 0.875rem;
+      font-weight: 500;
+      transition: all 0.15s;
+      background: transparent;
+      color: #94a3b8;
+    }
+
+    .tab-btn:hover { background: #334155; color: #e2e8f0; }
+    .tab-btn.active { background: #3b82f6; color: #fff; }
+
+    /* ── PAGES ── */
+    .page { display: none; padding: 2.5rem 2rem; max-width: 1100px; margin: 0 auto; }
+    .page.active { display: block; }
+
+    /* ── PAGE 1 ── */
+    .page-title {
+      font-size: 1.75rem;
+      font-weight: 700;
+      color: #f1f5f9;
+      margin-bottom: 0.4rem;
+    }
+
+    .page-subtitle {
+      color: #64748b;
+      font-size: 0.925rem;
+      margin-bottom: 2rem;
+    }
+
+    .section-label {
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: #475569;
+      margin-bottom: 0.75rem;
+      margin-top: 2rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .section-label::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: #1e293b;
+    }
+
+    .migration-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 0.75rem;
+    }
+
+    .migration-card {
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 10px;
+      padding: 1rem 1.1rem;
+      display: flex;
+      align-items: flex-start;
+      gap: 0.85rem;
+      transition: border-color 0.15s;
+    }
+
+    .migration-card:hover { border-color: #3b82f6; }
+
+    .migration-card.existing .card-num { background: #1d4ed8; color: #bfdbfe; }
+    .migration-card.new .card-num { background: #065f46; color: #6ee7b7; }
+
+    .card-num {
+      font-size: 0.7rem;
+      font-weight: 700;
+      padding: 0.2rem 0.45rem;
+      border-radius: 5px;
+      white-space: nowrap;
+      margin-top: 2px;
+      letter-spacing: 0.5px;
+    }
+
+    .card-body {}
+
+    .card-filename {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: #cbd5e1;
+      font-family: 'Consolas', 'Courier New', monospace;
+      margin-bottom: 0.2rem;
+    }
+
+    .card-tables {
+      font-size: 0.75rem;
+      color: #64748b;
+    }
+
+    .legend {
+      display: flex;
+      gap: 1.5rem;
+      margin-bottom: 1.5rem;
+      margin-top: 0.5rem;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.8rem;
+      color: #94a3b8;
+    }
+
+    .legend-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 3px;
+    }
+
+    .dot-existing { background: #1d4ed8; }
+    .dot-new { background: #065f46; }
+
+    .stats-row {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+
+    .stat-box {
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 10px;
+      padding: 0.9rem 1.3rem;
+      text-align: center;
+      min-width: 120px;
+    }
+
+    .stat-num {
+      font-size: 2rem;
+      font-weight: 800;
+      color: #3b82f6;
+      line-height: 1;
+    }
+
+    .stat-num.green { color: #10b981; }
+
+    .stat-label {
+      font-size: 0.72rem;
+      color: #64748b;
+      margin-top: 0.25rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    /* ── PAGE 2 ── */
+    .detail-table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      border: 1px solid #334155;
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    .detail-table thead {
+      background: #1e293b;
+    }
+
+    .detail-table th {
+      padding: 0.85rem 1.1rem;
+      text-align: left;
+      font-size: 0.72rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: #475569;
+      border-bottom: 1px solid #334155;
+    }
+
+    .detail-table td {
+      padding: 0.85rem 1.1rem;
+      font-size: 0.875rem;
+      border-bottom: 1px solid #1e293b;
+      vertical-align: top;
+    }
+
+    .detail-table tr:last-child td { border-bottom: none; }
+
+    .detail-table tbody tr { background: #111827; transition: background 0.1s; }
+    .detail-table tbody tr:hover { background: #1e293b; }
+
+    .detail-table tbody tr.separator td {
+      background: #0f172a;
+      padding: 0.4rem 1.1rem;
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #334155;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 0.15rem 0.5rem;
+      border-radius: 99px;
+      font-size: 0.7rem;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    .badge-existing { background: #1e3a8a; color: #93c5fd; }
+    .badge-new { background: #064e3b; color: #6ee7b7; }
+
+    .migration-name {
+      font-family: 'Consolas', 'Courier New', monospace;
+      font-size: 0.8rem;
+      color: #94a3b8;
+      margin-top: 0.2rem;
+    }
+
+    .tables-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.3rem;
+      margin-top: 0.35rem;
+    }
+
+    .table-tag {
+      background: #1e293b;
+      border: 1px solid #334155;
+      color: #64748b;
+      font-size: 0.65rem;
+      padding: 0.1rem 0.4rem;
+      border-radius: 4px;
+      font-family: monospace;
+    }
+
+    .col-num { width: 60px; }
+    .col-name { width: 260px; }
+    .col-why { }
+    .col-tables { width: 280px; }
+    .col-status { width: 90px; }
+
+    .why-text { color: #cbd5e1; line-height: 1.5; }
+  </style>
+</head>
+<body>
+
+<nav>
+  <span class="nav-logo">CRM Mobiliaria — Migraciones</span>
+  <div class="nav-tabs">
+    <button class="tab-btn active" onclick="showPage(1, this)">Vista general</button>
+    <button class="tab-btn" onclick="showPage(2, this)">Detalle por migración</button>
+  </div>
+</nav>
+
+<!-- ═══════════════════════════════════════════════════
+     PÁGINA 1 — VISTA GENERAL
+═══════════════════════════════════════════════════ -->
+<div class="page active" id="page1">
+
+  <p class="page-title">Base de datos — Migraciones</p>
+  <p class="page-subtitle">Schema completo del CRM Mobiliaria · Supabase PostgreSQL</p>
+
+  <div class="stats-row">
+    <div class="stat-box">
+      <div class="stat-num">18</div>
+      <div class="stat-label">Total migraciones</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-num">10</div>
+      <div class="stat-label">Existentes</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-num green">8</div>
+      <div class="stat-label">A agregar</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-num">25</div>
+      <div class="stat-label">Tablas totales</div>
+    </div>
+  </div>
+
+  <div class="legend">
+    <div class="legend-item"><div class="legend-dot dot-existing"></div> Ya existe en el proyecto</div>
+    <div class="legend-item"><div class="legend-dot dot-new"></div> Por agregar</div>
+  </div>
+
+  <div class="section-label">Migraciones existentes (001 – 010)</div>
+  <div class="migration-grid">
+
+    <div class="migration-card existing">
+      <span class="card-num">001</span>
+      <div class="card-body">
+        <div class="card-filename">001_enums_and_extensions.sql</div>
+        <div class="card-tables">14 ENUMs · 4 extensiones PostgreSQL</div>
+      </div>
+    </div>
+
+    <div class="migration-card existing">
+      <span class="card-num">002</span>
+      <div class="card-body">
+        <div class="card-filename">002_core_tables.sql</div>
+        <div class="card-tables">organizations · profiles · contacts</div>
+      </div>
+    </div>
+
+    <div class="migration-card existing">
+      <span class="card-num">003</span>
+      <div class="card-body">
+        <div class="card-filename">003_properties.sql</div>
+        <div class="card-tables">properties · property_images · property_features</div>
+      </div>
+    </div>
+
+    <div class="migration-card existing">
+      <span class="card-num">004</span>
+      <div class="card-body">
+        <div class="card-filename">004_pipeline.sql</div>
+        <div class="card-tables">opportunities · opportunity_activities</div>
+      </div>
+    </div>
+
+    <div class="migration-card existing">
+      <span class="card-num">005</span>
+      <div class="card-body">
+        <div class="card-filename">005_sales_and_amortization.sql</div>
+        <div class="card-tables">sales · amortization_schedules · amortization_lines · cuotas</div>
+      </div>
+    </div>
+
+    <div class="migration-card existing">
+      <span class="card-num">006</span>
+      <div class="card-body">
+        <div class="card-filename">006_payments_and_docs.sql</div>
+        <div class="card-tables">payments · documents</div>
+      </div>
+    </div>
+
+    <div class="migration-card existing">
+      <span class="card-num">007</span>
+      <div class="card-body">
+        <div class="card-filename">007_activities_notifications.sql</div>
+        <div class="card-tables">activities · notifications</div>
+      </div>
+    </div>
+
+    <div class="migration-card existing">
+      <span class="card-num">008</span>
+      <div class="card-body">
+        <div class="card-filename">008_triggers_and_functions.sql</div>
+        <div class="card-tables">fn_handle_new_auth_user · fn_custom_jwt_claims · fn_create_cuota · fn_update_timestamps</div>
+      </div>
+    </div>
+
+    <div class="migration-card existing">
+      <span class="card-num">009</span>
+      <div class="card-body">
+        <div class="card-filename">009_rls_policies.sql</div>
+        <div class="card-tables">Políticas RLS para las 17 tablas</div>
+      </div>
+    </div>
+
+    <div class="migration-card existing">
+      <span class="card-num">010</span>
+      <div class="card-body">
+        <div class="card-filename">010_seed_data.sql</div>
+        <div class="card-tables">Datos demo: organización · contactos · propiedades · venta · cuotas</div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="section-label">Migraciones por agregar (011 – 018)</div>
+  <div class="migration-grid">
+
+    <div class="migration-card new">
+      <span class="card-num">011</span>
+      <div class="card-body">
+        <div class="card-filename">011_developments.sql</div>
+        <div class="card-tables">developments · development_units</div>
+      </div>
+    </div>
+
+    <div class="migration-card new">
+      <span class="card-num">012</span>
+      <div class="card-body">
+        <div class="card-filename">012_appointments.sql</div>
+        <div class="card-tables">appointments</div>
+      </div>
+    </div>
+
+    <div class="migration-card new">
+      <span class="card-num">013</span>
+      <div class="card-body">
+        <div class="card-filename">013_valuations.sql</div>
+        <div class="card-tables">valuations</div>
+      </div>
+    </div>
+
+    <div class="migration-card new">
+      <span class="card-num">014</span>
+      <div class="card-body">
+        <div class="card-filename">014_rental_contracts.sql</div>
+        <div class="card-tables">rental_contracts · rental_payments</div>
+      </div>
+    </div>
+
+    <div class="migration-card new">
+      <span class="card-num">015</span>
+      <div class="card-body">
+        <div class="card-filename">015_contact_search_criteria.sql</div>
+        <div class="card-tables">contact_search_criteria</div>
+      </div>
+    </div>
+
+    <div class="migration-card new">
+      <span class="card-num">016</span>
+      <div class="card-body">
+        <div class="card-filename">016_portal_publications.sql</div>
+        <div class="card-tables">portal_publications</div>
+      </div>
+    </div>
+
+    <div class="migration-card new">
+      <span class="card-num">017</span>
+      <div class="card-body">
+        <div class="card-filename">017_commission_payments.sql</div>
+        <div class="card-tables">commission_payments</div>
+      </div>
+    </div>
+
+    <div class="migration-card new">
+      <span class="card-num">018</span>
+      <div class="card-body">
+        <div class="card-filename">018_message_templates.sql</div>
+        <div class="card-tables">message_templates</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════
+     PÁGINA 2 — DETALLE POR MIGRACIÓN
+═══════════════════════════════════════════════════ -->
+<div class="page" id="page2">
+
+  <p class="page-title">Detalle por migración</p>
+  <p class="page-subtitle">Nombre, tablas y razón de existencia de cada archivo SQL</p>
+
+  <table class="detail-table">
+    <thead>
+      <tr>
+        <th class="col-num">#</th>
+        <th class="col-name">Nombre del archivo</th>
+        <th class="col-why">Por qué se creó</th>
+        <th class="col-tables">Tablas que crea</th>
+        <th class="col-status">Estado</th>
+      </tr>
+    </thead>
+    <tbody>
+
+      <tr class="separator"><td colspan="5">— Migraciones existentes —</td></tr>
+
+      <tr>
+        <td><strong>001</strong></td>
+        <td><div class="migration-name">001_enums_and_extensions.sql</div></td>
+        <td class="why-text">Define los tipos de datos personalizados del dominio inmobiliario (estados de propiedad, métodos de pago, monedas LATAM, tipos de amortización, etc.) y activa las extensiones de PostgreSQL necesarias para búsqueda de texto con acentos y búsqueda por similitud.</td>
+        <td><div class="tables-list"><span class="table-tag">14 ENUMs</span><span class="table-tag">uuid-ossp</span><span class="table-tag">pg_trgm</span><span class="table-tag">unaccent</span><span class="table-tag">btree_gin</span></div></td>
+        <td><span class="badge badge-existing">Existe</span></td>
+      </tr>
+
+      <tr>
+        <td><strong>002</strong></td>
+        <td><div class="migration-name">002_core_tables.sql</div></td>
+        <td class="why-text">Crea el núcleo del sistema multi-tenant. Cada inmobiliaria es una <em>organization</em>. Los usuarios del CRM son <em>profiles</em> (espejo de auth.users). Los clientes, propietarios y compradores son <em>contacts</em>.</td>
+        <td><div class="tables-list"><span class="table-tag">organizations</span><span class="table-tag">profiles</span><span class="table-tag">contacts</span></div></td>
+        <td><span class="badge badge-existing">Existe</span></td>
+      </tr>
+
+      <tr>
+        <td><strong>003</strong></td>
+        <td><div class="migration-name">003_properties.sql</div></td>
+        <td class="why-text">El inventario de propiedades es la razón de ser del CRM. Se separan las imágenes y características en tablas propias para soportar múltiples fotos y atributos variables (pileta, cochera, gimnasio, etc.) sin columnas nulas.</td>
+        <td><div class="tables-list"><span class="table-tag">properties</span><span class="table-tag">property_images</span><span class="table-tag">property_features</span></div></td>
+        <td><span class="badge badge-existing">Existe</span></td>
+      </tr>
+
+      <tr>
+        <td><strong>004</strong></td>
+        <td><div class="migration-name">004_pipeline.sql</div></td>
+        <td class="why-text">Modela el proceso de venta como un pipeline Kanban. Una <em>opportunity</em> conecta un contacto con una propiedad y avanza por etapas (prospecto → interesado → negociando → cierre). Las actividades registran cada interacción del agente.</td>
+        <td><div class="tables-list"><span class="table-tag">opportunities</span><span class="table-tag">opportunity_activities</span></div></td>
+        <td><span class="badge badge-existing">Existe</span></td>
+      </tr>
+
+      <tr>
+        <td><strong>005</strong></td>
+        <td><div class="migration-name">005_sales_and_amortization.sql</div></td>
+        <td class="why-text">El diferenciador clave del sistema frente a Tokko Broker. Registra la venta cerrada, el plan de financiamiento (amortización francesa, alemana, fija), las líneas de cuota calculadas, y las cuotas operativas que el comprador ve en su portal. Las columnas <em>amount_outstanding</em> y <em>days_overdue</em> son generadas automáticamente.</td>
+        <td><div class="tables-list"><span class="table-tag">sales</span><span class="table-tag">amortization_schedules</span><span class="table-tag">amortization_lines</span><span class="table-tag">cuotas</span></div></td>
+        <td><span class="badge badge-existing">Existe</span></td>
+      </tr>
+
+      <tr>
+        <td><strong>006</strong></td>
+        <td><div class="migration-name">006_payments_and_docs.sql</div></td>
+        <td class="why-text">Registra los pagos individuales aplicados a cada cuota (un comprador puede pagar parcialmente). Los documentos guardan referencia a recibos, contratos y tablas de amortización generados en PDF por el sistema.</td>
+        <td><div class="tables-list"><span class="table-tag">payments</span><span class="table-tag">documents</span></div></td>
+        <td><span class="badge badge-existing">Existe</span></td>
+      </tr>
+
+      <tr>
+        <td><strong>007</strong></td>
+        <td><div class="migration-name">007_activities_notifications.sql</div></td>
+        <td class="why-text">El log de auditoría registra todo lo que ocurre en el sistema (quién cambió qué y cuándo). Las notificaciones alertan a agentes y compradores por distintos canales (in-app, email, WhatsApp) sobre cuotas vencidas, nuevos leads, etc.</td>
+        <td><div class="tables-list"><span class="table-tag">activities</span><span class="table-tag">notifications</span></div></td>
+        <td><span class="badge badge-existing">Existe</span></td>
+      </tr>
+
+      <tr>
+        <td><strong>008</strong></td>
+        <td><div class="migration-name">008_triggers_and_functions.sql</div></td>
+        <td class="why-text">Automatiza la lógica de negocio directamente en la base de datos: crea el perfil de usuario automáticamente al registrarse, inyecta el rol y la organización en el JWT de Supabase, genera cuotas automáticamente al insertar líneas de amortización, y mantiene los timestamps actualizados.</td>
+        <td><div class="tables-list"><span class="table-tag">fn_handle_new_auth_user</span><span class="table-tag">fn_custom_jwt_claims</span><span class="table-tag">fn_create_cuota</span><span class="table-tag">fn_update_timestamps</span></div></td>
+        <td><span class="badge badge-existing">Existe</span></td>
+      </tr>
+
+      <tr>
+        <td><strong>009</strong></td>
+        <td><div class="migration-name">009_rls_policies.sql</div></td>
+        <td class="why-text">Implementa seguridad a nivel de fila en PostgreSQL. Garantiza que un agente de la inmobiliaria A nunca pueda ver datos de la inmobiliaria B, y que un comprador solo vea sus propias cuotas y pagos. Sin esto, cualquier bug en el backend podría exponer datos de otros tenants.</td>
+        <td><div class="tables-list"><span class="table-tag">RLS en 17 tablas</span></div></td>
+        <td><span class="badge badge-existing">Existe</span></td>
+      </tr>
+
+      <tr>
+        <td><strong>010</strong></td>
+        <td><div class="migration-name">010_seed_data.sql</div></td>
+        <td class="why-text">Inserta datos de ejemplo realistas para poder desarrollar y probar el sistema sin necesidad de cargar datos manualmente. Incluye una organización demo, contactos, propiedades argentinas, una venta con financiamiento y 12 cuotas generadas automáticamente.</td>
+        <td><div class="tables-list"><span class="table-tag">datos demo</span></div></td>
+        <td><span class="badge badge-existing">Existe</span></td>
+      </tr>
+
+      <tr class="separator"><td colspan="5">— Migraciones por agregar —</td></tr>
+
+      <tr>
+        <td><strong>011</strong></td>
+        <td><div class="migration-name">011_developments.sql</div></td>
+        <td class="why-text">Tokko permite cargar edificios o countries (emprendimientos) como una entidad padre que agrupa múltiples unidades. Sin esta tabla, cada unidad de un edificio de 50 pisos se carga como una propiedad independiente sin relación entre sí, perdiendo la visión del proyecto como un todo.</td>
+        <td><div class="tables-list"><span class="table-tag">developments</span><span class="table-tag">development_units</span></div></td>
+        <td><span class="badge badge-new">Por agregar</span></td>
+      </tr>
+
+      <tr>
+        <td><strong>012</strong></td>
+        <td><div class="migration-name">012_appointments.sql</div></td>
+        <td class="why-text">La tabla <em>activities</em> existente es un log del pasado. Se necesita una tabla separada para gestionar eventos futuros: visitas programadas a propiedades, llamadas, reuniones. Tokko llama a este módulo "Booker". Sin esto, los agentes no tienen agenda dentro del CRM.</td>
+        <td><div class="tables-list"><span class="table-tag">appointments</span></div></td>
+        <td><span class="badge badge-new">Por agregar</span></td>
+      </tr>
+
+      <tr>
+        <td><strong>013</strong></td>
+        <td><div class="migration-name">013_valuations.sql</div></td>
+        <td class="why-text">Antes de captar una propiedad, el agente realiza una tasación. Tokko maneja estados específicos: Pendiente → Tasada → Ingresada (propietario aceptó) o Caída (rechazó). Sin esta tabla, no se puede hacer seguimiento del proceso de captación de propiedades.</td>
+        <td><div class="tables-list"><span class="table-tag">valuations</span></div></td>
+        <td><span class="badge badge-new">Por agregar</span></td>
+      </tr>
+
+      <tr>
+        <td><strong>014</strong></td>
+        <td><div class="migration-name">014_rental_contracts.sql</div></td>
+        <td class="why-text">El sistema ya maneja ventas con financiamiento, pero el alquiler tiene una lógica diferente: contrato con vigencia, depósito de garantía, actualizaciones periódicas de precio (índice ICL, IPC) y pagos mensuales recurrentes. Se necesitan tablas propias para no contaminar el modelo de ventas.</td>
+        <td><div class="tables-list"><span class="table-tag">rental_contracts</span><span class="table-tag">rental_payments</span></div></td>
+        <td><span class="badge badge-new">Por agregar</span></td>
+      </tr>
+
+      <tr>
+        <td><strong>015</strong></td>
+        <td><div class="migration-name">015_contact_search_criteria.sql</div></td>
+        <td class="why-text">Para que el sistema pueda hacer matching automático (enviarle a un comprador propiedades que coincidan con lo que busca), necesita saber sus filtros: tipo de propiedad, zona, precio máximo, m² mínimos, ambientes. Sin esta tabla, los seguimientos automáticos de Tokko no son replicables.</td>
+        <td><div class="tables-list"><span class="table-tag">contact_search_criteria</span></div></td>
+        <td><span class="badge badge-new">Por agregar</span></td>
+      </tr>
+
+      <tr>
+        <td><strong>016</strong></td>
+        <td><div class="migration-name">016_portal_publications.sql</div></td>
+        <td class="why-text">Registra el estado de cada propiedad en cada portal externo (ZonaProp, Argenprop, MercadoLibre). Permite saber si está publicada, en qué plan (gratuito/destacado/premium), cuándo se sincronizó por última vez y si hubo errores. Sin esto, la difusión masiva es una caja negra.</td>
+        <td><div class="tables-list"><span class="table-tag">portal_publications</span></div></td>
+        <td><span class="badge badge-new">Por agregar</span></td>
+      </tr>
+
+      <tr>
+        <td><strong>017</strong></td>
+        <td><div class="migration-name">017_commission_payments.sql</div></td>
+        <td class="why-text">La comisión acordada ya se guarda en <em>sales</em>, pero falta registrar si fue efectivamente cobrada, cuándo, y cómo se dividió entre agentes cuando hay co-venta (agente captador + agente vendedor). Necesario para la liquidación mensual de comisiones al equipo.</td>
+        <td><div class="tables-list"><span class="table-tag">commission_payments</span></div></td>
+        <td><span class="badge badge-new">Por agregar</span></td>
+      </tr>
+
+      <tr>
+        <td><strong>018</strong></td>
+        <td><div class="migration-name">018_message_templates.sql</div></td>
+        <td class="why-text">Permite que los administradores creen plantillas reutilizables para emails y WhatsApp con variables dinámicas (nombre del contacto, precio, dirección). Sin esto, cada mensaje es redactado manualmente. Tokko las llama "respuestas rápidas" y son clave para la automatización de seguimientos.</td>
+        <td><div class="tables-list"><span class="table-tag">message_templates</span></div></td>
+        <td><span class="badge badge-new">Por agregar</span></td>
+      </tr>
+
+    </tbody>
+  </table>
+
+</div>
+
+<script>
+  function showPage(num, btn) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('page' + num).classList.add('active');
+    btn.classList.add('active');
+  }
+</script>
+
+</body>
+</html>

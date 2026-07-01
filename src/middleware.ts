@@ -2,6 +2,14 @@ import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
 export async function middleware(request: NextRequest) {
+  const { pathname } = request.nextUrl
+
+  // Public routes — skip Supabase entirely for fast response
+  const publicRoutes = ['/', '/login', '/portal/login']
+  if (publicRoutes.some(route => pathname === route)) {
+    return NextResponse.next({ request })
+  }
+
   let supabaseResponse = NextResponse.next({ request })
 
   const supabase = createServerClient(
@@ -24,14 +32,6 @@ export async function middleware(request: NextRequest) {
   )
 
   const { data: { user } } = await supabase.auth.getUser()
-
-  const { pathname } = request.nextUrl
-
-  // Public routes — no auth required
-  const publicRoutes = ['/', '/login', '/portal/login']
-  if (publicRoutes.some(route => pathname === route)) {
-    return supabaseResponse
-  }
 
   // Not logged in — redirect to login
   if (!user) {

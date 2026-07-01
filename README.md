@@ -2,10 +2,6 @@
 
 CRM B2B SaaS para agencias inmobiliarias de Latinoamérica.
 
-## Diferenciador clave
-
-Módulo de cuotas post-venta con tabla de amortización integrada — funcionalidad ausente en Tokko Broker y la mayoría de CRMs inmobiliarios de LATAM.
-
 ## Stack
 
 | Capa | Tecnología |

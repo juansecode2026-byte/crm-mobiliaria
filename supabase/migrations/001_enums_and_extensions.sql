@@ -114,9 +114,7 @@ CREATE TYPE public.amortization_type AS ENUM (
 CREATE TYPE public.activity_entity_type AS ENUM (
     'contact',
     'property',
-    'opportunity',
-    'sale',
-    'cuota',
+    'operation',
     'payment',
     'document'
 );

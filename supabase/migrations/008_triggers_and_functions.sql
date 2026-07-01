@@ -43,7 +43,7 @@ DECLARE
 BEGIN
     FOREACH t IN ARRAY ARRAY[
         'organizations', 'profiles', 'contacts', 'properties',
-        'opportunities', 'sales', 'cuotas', 'payments', 'integrations'
+        'operations', 'payments', 'integrations'
     ] LOOP
         EXECUTE format('
             CREATE TRIGGER trg_set_updated_at
@@ -78,9 +78,9 @@ CREATE TRIGGER trg_handle_new_auth_user
     FOR EACH ROW EXECUTE FUNCTION public.fn_handle_new_auth_user();
 
 -- ============================================================
--- TRIGGER: Track pipeline stage changes on opportunities
+-- TRIGGER: Cambio de etapa en operaciones
 -- ============================================================
-CREATE OR REPLACE FUNCTION public.fn_opportunity_stage_change()
+CREATE OR REPLACE FUNCTION public.fn_operation_stage_change()
 RETURNS TRIGGER LANGUAGE plpgsql SECURITY DEFINER AS $$
 BEGIN
     IF OLD.stage IS DISTINCT FROM NEW.stage THEN
@@ -93,7 +93,7 @@ BEGIN
             NEW.organization_id,
             auth.uid(),
             'stage_changed',
-            'opportunity',
+            'operation',
             NEW.id,
             jsonb_build_object('stage', OLD.stage),
             jsonb_build_object('stage', NEW.stage),
@@ -101,89 +101,27 @@ BEGIN
         );
 
         IF NEW.stage = 'vendido' THEN
-            UPDATE public.properties
-            SET status = 'sold'
-            WHERE id = NEW.property_id;
+            UPDATE public.properties SET status = 'sold' WHERE id = NEW.property_id;
         END IF;
 
         IF OLD.stage = 'vendido' AND NEW.stage != 'vendido' THEN
-            UPDATE public.properties
-            SET status = 'available'
-            WHERE id = NEW.property_id;
+            UPDATE public.properties SET status = 'available' WHERE id = NEW.property_id;
         END IF;
     END IF;
     RETURN NEW;
 END;
 $$;
 
-CREATE TRIGGER trg_opportunity_stage_change
-    BEFORE UPDATE ON public.opportunities
-    FOR EACH ROW EXECUTE FUNCTION public.fn_opportunity_stage_change();
+CREATE TRIGGER trg_operation_stage_change
+    BEFORE UPDATE ON public.operations
+    FOR EACH ROW EXECUTE FUNCTION public.fn_operation_stage_change();
 
 -- ============================================================
--- TRIGGER: Auto-create cuotas when amortization_lines are inserted
+-- TRIGGER: Registrar pago contra una operación
 -- ============================================================
-CREATE OR REPLACE FUNCTION public.fn_create_cuota_from_amortization_line()
+CREATE OR REPLACE FUNCTION public.fn_log_payment()
 RETURNS TRIGGER LANGUAGE plpgsql SECURITY DEFINER AS $$
-DECLARE
-    v_sale RECORD;
 BEGIN
-    SELECT s.id, s.organization_id, s.contact_id
-    INTO v_sale
-    FROM public.amortization_schedules sch
-    JOIN public.sales s ON s.id = sch.sale_id
-    WHERE sch.id = NEW.schedule_id;
-
-    INSERT INTO public.cuotas (
-        organization_id, sale_id, amortization_line_id,
-        contact_id, installment_number, due_date,
-        amount_due, currency, status
-    ) VALUES (
-        NEW.organization_id,
-        v_sale.id,
-        NEW.id,
-        v_sale.contact_id,
-        NEW.installment_number,
-        NEW.due_date,
-        NEW.total_amount,
-        NEW.currency,
-        'pending'
-    )
-    ON CONFLICT (sale_id, installment_number) DO NOTHING;
-
-    RETURN NEW;
-END;
-$$;
-
-CREATE TRIGGER trg_create_cuota_from_amort_line
-    AFTER INSERT ON public.amortization_lines
-    FOR EACH ROW EXECUTE FUNCTION public.fn_create_cuota_from_amortization_line();
-
--- ============================================================
--- TRIGGER: Update cuota status when a payment is registered
--- ============================================================
-CREATE OR REPLACE FUNCTION public.fn_update_cuota_on_payment()
-RETURNS TRIGGER LANGUAGE plpgsql SECURITY DEFINER AS $$
-DECLARE
-    v_cuota RECORD;
-BEGIN
-    SELECT id, amount_due, amount_paid
-    INTO v_cuota
-    FROM public.cuotas
-    WHERE id = NEW.cuota_id
-    FOR UPDATE;
-
-    UPDATE public.cuotas
-    SET
-        amount_paid = amount_paid + NEW.amount,
-        last_payment_date = NEW.payment_date,
-        status = CASE
-            WHEN (amount_paid + NEW.amount) >= amount_due THEN 'paid'::public.quota_status
-            WHEN (amount_paid + NEW.amount) > 0 THEN 'partial'::public.quota_status
-            ELSE status
-        END
-    WHERE id = NEW.cuota_id;
-
     INSERT INTO public.activities (
         organization_id, performed_by, activity_type,
         entity_type, entity_id, new_values, description
@@ -193,55 +131,16 @@ BEGIN
         'payment_received',
         'payment',
         NEW.id,
-        jsonb_build_object('amount', NEW.amount, 'currency', NEW.currency, 'method', NEW.payment_method),
-        format('Pago de %s %s registrado', NEW.amount, NEW.currency)
+        jsonb_build_object('amount', NEW.amount, 'currency', NEW.currency, 'concept', NEW.concept),
+        format('Pago registrado: %s %s — %s', NEW.amount, NEW.currency, NEW.concept)
     );
-
     RETURN NEW;
 END;
 $$;
 
-CREATE TRIGGER trg_update_cuota_on_payment
+CREATE TRIGGER trg_log_payment
     AFTER INSERT ON public.payments
-    FOR EACH ROW EXECUTE FUNCTION public.fn_update_cuota_on_payment();
-
--- ============================================================
--- STORED PROCEDURE: Mark overdue cuotas (called daily via n8n cron)
--- ============================================================
-CREATE OR REPLACE FUNCTION public.fn_mark_overdue_cuotas()
-RETURNS INTEGER LANGUAGE plpgsql SECURITY DEFINER AS $$
-DECLARE
-    v_count INTEGER;
-BEGIN
-    WITH updated AS (
-        UPDATE public.cuotas
-        SET status = 'overdue'
-        WHERE status = 'pending'
-          AND due_date < CURRENT_DATE
-          AND amount_paid = 0
-        RETURNING id, organization_id, contact_id, sale_id, installment_number
-    )
-    INSERT INTO public.notifications (
-        organization_id, recipient_profile_id, notification_type,
-        channel, title, body, entity_type, entity_id
-    )
-    SELECT DISTINCT
-        u.organization_id,
-        s.agent_id,
-        'payment_overdue',
-        'in_app',
-        'Cuota vencida',
-        format('Cuota #%s vencida', u.installment_number),
-        'cuota',
-        u.id
-    FROM updated u
-    JOIN public.sales s ON s.id = u.sale_id
-    WHERE s.agent_id IS NOT NULL;
-
-    GET DIAGNOSTICS v_count = ROW_COUNT;
-    RETURN v_count;
-END;
-$$;
+    FOR EACH ROW EXECUTE FUNCTION public.fn_log_payment();
 
 -- ============================================================
 -- CUSTOM JWT CLAIMS HOOK
