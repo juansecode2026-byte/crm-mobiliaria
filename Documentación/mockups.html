@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>CRM Mobiliaria — Mockups</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; background: #f8fafc; color: #0f172a; }
+
+  /* ── SCREEN SWITCHER ── */
+  .switcher {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+    background: #1e293b; display: flex; gap: 2px; padding: 8px 16px;
+    align-items: center; border-bottom: 2px solid #334155;
+  }
+  .switcher-label { color: #64748b; font-size: 11px; font-weight: 600; margin-right: 8px; text-transform: uppercase; letter-spacing: 1px; }
+  .sw-btn {
+    padding: 6px 14px; border-radius: 6px; border: none; cursor: pointer;
+    font-size: 12px; font-weight: 500; background: transparent; color: #94a3b8; transition: all 0.15s;
+  }
+  .sw-btn:hover { background: #334155; color: #e2e8f0; }
+  .sw-btn.active { background: #3b82f6; color: #fff; }
+  .screen { display: none; margin-top: 48px; }
+  .screen.active { display: block; }
+
+  /* ════════════════════════════════════════
+     SCREEN 1 — LANDING PAGE
+  ════════════════════════════════════════ */
+  .lp-nav {
+    background: #fff; border-bottom: 1px solid #e2e8f0;
+    padding: 0 48px; display: flex; align-items: center; height: 64px;
+    position: sticky; top: 48px; z-index: 10;
+  }
+  .lp-logo { font-size: 18px; font-weight: 800; color: #1e3a8a; letter-spacing: -0.5px; }
+  .lp-logo span { color: #3b82f6; }
+  .lp-nav-links { display: flex; gap: 28px; margin-left: 40px; }
+  .lp-nav-links a { font-size: 14px; color: #475569; text-decoration: none; font-weight: 500; }
+  .lp-nav-cta { margin-left: auto; display: flex; gap: 10px; }
+  .btn-outline { padding: 8px 18px; border-radius: 8px; border: 1.5px solid #3b82f6; color: #3b82f6; background: transparent; font-size: 13px; font-weight: 600; cursor: pointer; }
+  .btn-primary { padding: 8px 18px; border-radius: 8px; border: none; background: #3b82f6; color: #fff; font-size: 13px; font-weight: 600; cursor: pointer; }
+  .btn-primary:hover { background: #2563eb; }
+
+  .lp-hero {
+    background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 50%, #1d4ed8 100%);
+    padding: 80px 48px; text-align: center; color: #fff;
+  }
+  .lp-hero-badge { display: inline-block; background: rgba(59,130,246,0.3); border: 1px solid rgba(59,130,246,0.5); color: #93c5fd; padding: 4px 14px; border-radius: 99px; font-size: 12px; font-weight: 600; margin-bottom: 20px; }
+  .lp-hero h1 { font-size: 48px; font-weight: 800; line-height: 1.1; margin-bottom: 20px; letter-spacing: -1px; }
+  .lp-hero h1 span { color: #60a5fa; }
+  .lp-hero p { font-size: 18px; color: #94a3b8; max-width: 560px; margin: 0 auto 36px; line-height: 1.6; }
+  .lp-hero-btns { display: flex; gap: 12px; justify-content: center; }
+  .btn-hero { padding: 14px 28px; border-radius: 10px; font-size: 15px; font-weight: 700; cursor: pointer; border: none; }
+  .btn-hero-primary { background: #3b82f6; color: #fff; }
+  .btn-hero-secondary { background: rgba(255,255,255,0.1); color: #fff; border: 1.5px solid rgba(255,255,255,0.2); }
+
+  .lp-stats { display: flex; justify-content: center; gap: 48px; padding: 40px 48px; background: #fff; border-bottom: 1px solid #e2e8f0; }
+  .lp-stat { text-align: center; }
+  .lp-stat-num { font-size: 32px; font-weight: 800; color: #1e3a8a; }
+  .lp-stat-label { font-size: 13px; color: #64748b; margin-top: 2px; }
+
+  .lp-features { padding: 64px 48px; background: #f8fafc; }
+  .lp-section-title { text-align: center; font-size: 28px; font-weight: 800; color: #0f172a; margin-bottom: 8px; }
+  .lp-section-sub { text-align: center; color: #64748b; font-size: 15px; margin-bottom: 48px; }
+  .lp-features-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; max-width: 960px; margin: 0 auto; }
+  .lp-feature-card { background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 24px; }
+  .lp-feature-icon { width: 40px; height: 40px; border-radius: 10px; background: #eff6ff; display: flex; align-items: center; justify-content: center; font-size: 20px; margin-bottom: 14px; }
+  .lp-feature-title { font-size: 15px; font-weight: 700; color: #0f172a; margin-bottom: 6px; }
+  .lp-feature-desc { font-size: 13px; color: #64748b; line-height: 1.5; }
+
+  .lp-compare { padding: 64px 48px; background: #fff; }
+  .lp-compare-table { max-width: 700px; margin: 0 auto; border: 1px solid #e2e8f0; border-radius: 12px; overflow: hidden; }
+  .lp-compare-table table { width: 100%; border-collapse: collapse; }
+  .lp-compare-table th { padding: 14px 20px; font-size: 13px; font-weight: 700; text-align: left; }
+  .lp-compare-table th:first-child { background: #f8fafc; color: #475569; }
+  .lp-compare-table th:nth-child(2) { background: #eff6ff; color: #1e3a8a; text-align: center; }
+  .lp-compare-table th:nth-child(3) { background: #f8fafc; color: #94a3b8; text-align: center; }
+  .lp-compare-table td { padding: 12px 20px; font-size: 13px; border-top: 1px solid #f1f5f9; }
+  .lp-compare-table td:nth-child(2), .lp-compare-table td:nth-child(3) { text-align: center; }
+  .check { color: #10b981; font-size: 16px; }
+  .cross { color: #f43f5e; font-size: 16px; }
+
+  .lp-pricing { padding: 64px 48px; background: #f8fafc; }
+  .lp-pricing-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 20px; max-width: 860px; margin: 0 auto; }
+  .lp-plan { background: #fff; border: 1px solid #e2e8f0; border-radius: 14px; padding: 28px; }
+  .lp-plan.featured { border: 2px solid #3b82f6; position: relative; }
+  .lp-plan-badge { position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background: #3b82f6; color: #fff; font-size: 11px; font-weight: 700; padding: 3px 12px; border-radius: 99px; white-space: nowrap; }
+  .lp-plan-name { font-size: 16px; font-weight: 700; color: #0f172a; margin-bottom: 4px; }
+  .lp-plan-price { font-size: 32px; font-weight: 800; color: #1e3a8a; margin: 12px 0; }
+  .lp-plan-price span { font-size: 14px; font-weight: 400; color: #64748b; }
+  .lp-plan-features { list-style: none; margin: 16px 0 24px; }
+  .lp-plan-features li { font-size: 13px; color: #475569; padding: 5px 0; display: flex; align-items: center; gap: 8px; }
+  .lp-plan-features li::before { content: '✓'; color: #10b981; font-weight: 700; }
+
+  /* ════════════════════════════════════════
+     SCREEN 2 — DASHBOARD
+  ════════════════════════════════════════ */
+  .crm-layout { display: flex; min-height: calc(100vh - 48px); }
+  .crm-sidebar {
+    width: 220px; background: #0f172a; flex-shrink: 0;
+    display: flex; flex-direction: column; padding: 20px 0;
+    position: sticky; top: 48px; height: calc(100vh - 48px);
+  }
+  .crm-logo { padding: 0 20px 24px; font-size: 16px; font-weight: 800; color: #fff; letter-spacing: -0.3px; border-bottom: 1px solid #1e293b; margin-bottom: 8px; }
+  .crm-logo span { color: #3b82f6; }
+  .nav-section { padding: 8px 12px 4px; font-size: 10px; font-weight: 700; color: #334155; text-transform: uppercase; letter-spacing: 1px; }
+  .nav-item { display: flex; align-items: center; gap: 10px; padding: 9px 20px; font-size: 13px; color: #94a3b8; cursor: pointer; border-radius: 0; transition: all 0.1s; margin: 1px 8px; border-radius: 8px; }
+  .nav-item:hover { background: #1e293b; color: #e2e8f0; }
+  .nav-item.active { background: #1e3a8a; color: #fff; }
+  .nav-item .icon { width: 16px; text-align: center; }
+  .nav-badge { margin-left: auto; background: #ef4444; color: #fff; font-size: 10px; font-weight: 700; padding: 1px 6px; border-radius: 99px; }
+  .crm-main { flex: 1; padding: 28px 32px; overflow-y: auto; }
+  .crm-topbar { display: flex; align-items: center; margin-bottom: 28px; }
+  .crm-page-title { font-size: 22px; font-weight: 800; color: #0f172a; }
+  .crm-page-sub { font-size: 13px; color: #64748b; margin-top: 2px; }
+  .crm-topbar-right { margin-left: auto; display: flex; align-items: center; gap: 12px; }
+  .topbar-avatar { width: 36px; height: 36px; border-radius: 50%; background: #1e3a8a; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; }
+
+  .stats-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 16px; margin-bottom: 24px; }
+  .stat-card { background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; }
+  .stat-card-label { font-size: 12px; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
+  .stat-card-value { font-size: 28px; font-weight: 800; color: #0f172a; }
+  .stat-card-change { font-size: 12px; margin-top: 4px; }
+  .stat-card-change.up { color: #10b981; }
+  .stat-card-change.down { color: #f43f5e; }
+  .stat-card-icon { float: right; width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+
+  .dashboard-grid { display: grid; grid-template-columns: 1fr 320px; gap: 20px; }
+  .card { background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; }
+  .card-title { font-size: 14px; font-weight: 700; color: #0f172a; margin-bottom: 16px; display: flex; align-items: center; justify-content: space-between; }
+  .card-title-link { font-size: 12px; font-weight: 500; color: #3b82f6; cursor: pointer; }
+
+  .pipeline-mini { display: flex; gap: 8px; margin-bottom: 12px; }
+  .pipeline-stage-mini { flex: 1; background: #f8fafc; border-radius: 8px; padding: 10px 8px; text-align: center; border: 1px solid #e2e8f0; }
+  .pipeline-stage-mini .psm-label { font-size: 10px; font-weight: 600; color: #64748b; text-transform: uppercase; }
+  .pipeline-stage-mini .psm-count { font-size: 22px; font-weight: 800; color: #0f172a; margin: 4px 0; }
+  .pipeline-stage-mini .psm-value { font-size: 11px; color: #64748b; }
+
+  .activity-item { display: flex; gap: 12px; padding: 10px 0; border-bottom: 1px solid #f1f5f9; align-items: flex-start; }
+  .activity-item:last-child { border-bottom: none; }
+  .activity-dot { width: 8px; height: 8px; border-radius: 50%; background: #3b82f6; margin-top: 5px; flex-shrink: 0; }
+  .activity-dot.green { background: #10b981; }
+  .activity-dot.amber { background: #f59e0b; }
+  .activity-text { font-size: 13px; color: #334155; line-height: 1.4; }
+  .activity-time { font-size: 11px; color: #94a3b8; margin-top: 2px; }
+
+  .op-list-item { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid #f1f5f9; }
+  .op-list-item:last-child { border-bottom: none; }
+  .op-avatar { width: 36px; height: 36px; border-radius: 8px; background: #eff6ff; color: #1e3a8a; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; flex-shrink: 0; }
+  .op-info { flex: 1; }
+  .op-name { font-size: 13px; font-weight: 600; color: #0f172a; }
+  .op-prop { font-size: 12px; color: #64748b; }
+  .op-price { font-size: 13px; font-weight: 700; color: #0f172a; }
+  .stage-badge { font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 99px; }
+  .stage-prospecto { background: #f1f5f9; color: #475569; }
+  .stage-interesado { background: #eff6ff; color: #1d4ed8; }
+  .stage-negociando { background: #fefce8; color: #a16207; }
+  .stage-vendido { background: #f0fdf4; color: #15803d; }
+
+  /* ════════════════════════════════════════
+     SCREEN 3 — KANBAN
+  ════════════════════════════════════════ */
+  .kanban-bar { display: flex; align-items: center; gap: 12px; padding: 16px 24px; background: #fff; border-bottom: 1px solid #e2e8f0; }
+  .kanban-title { font-size: 18px; font-weight: 800; color: #0f172a; }
+  .kanban-filter { padding: 7px 14px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 13px; color: #475569; background: #fff; cursor: pointer; }
+  .kanban-btn { padding: 7px 16px; border-radius: 8px; background: #3b82f6; color: #fff; border: none; font-size: 13px; font-weight: 600; cursor: pointer; margin-left: auto; }
+  .kanban-board { display: flex; gap: 12px; padding: 20px; overflow-x: auto; min-height: calc(100vh - 140px); background: #f8fafc; }
+  .kanban-col { flex-shrink: 0; width: 240px; }
+  .kanban-col-header { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; padding: 0 4px; }
+  .kanban-col-dot { width: 8px; height: 8px; border-radius: 50%; }
+  .kanban-col-name { font-size: 12px; font-weight: 700; color: #475569; text-transform: uppercase; letter-spacing: 0.5px; }
+  .kanban-col-count { margin-left: auto; background: #e2e8f0; color: #475569; font-size: 11px; font-weight: 700; padding: 1px 7px; border-radius: 99px; }
+  .kanban-card { background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 14px; margin-bottom: 8px; cursor: grab; transition: box-shadow 0.15s; }
+  .kanban-card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.08); border-color: #cbd5e1; }
+  .kanban-card-title { font-size: 13px; font-weight: 700; color: #0f172a; margin-bottom: 6px; }
+  .kanban-card-prop { font-size: 11px; color: #64748b; margin-bottom: 10px; }
+  .kanban-card-footer { display: flex; align-items: center; justify-content: space-between; }
+  .kanban-card-price { font-size: 13px; font-weight: 700; color: #1e3a8a; }
+  .kanban-card-agent { width: 24px; height: 24px; border-radius: 50%; background: #dbeafe; color: #1e40af; font-size: 10px; font-weight: 700; display: flex; align-items: center; justify-content: center; }
+  .kanban-card-days { font-size: 10px; color: #94a3b8; margin-top: 8px; }
+
+  /* ════════════════════════════════════════
+     SCREEN 4 — PROPIEDADES
+  ════════════════════════════════════════ */
+  .props-bar { display: flex; align-items: center; gap: 10px; padding: 16px 24px; background: #fff; border-bottom: 1px solid #e2e8f0; flex-wrap: wrap; }
+  .props-title { font-size: 18px; font-weight: 800; color: #0f172a; margin-right: 8px; }
+  .props-search { flex: 1; min-width: 200px; padding: 8px 14px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 13px; color: #0f172a; }
+  .props-filter { padding: 7px 14px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 13px; color: #475569; background: #fff; cursor: pointer; }
+  .props-btn { padding: 8px 16px; border-radius: 8px; background: #3b82f6; color: #fff; border: none; font-size: 13px; font-weight: 600; cursor: pointer; margin-left: auto; }
+  .props-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 16px; padding: 20px 24px; background: #f8fafc; }
+  .prop-card { background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; overflow: hidden; transition: box-shadow 0.15s; }
+  .prop-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.08); }
+  .prop-img { height: 160px; background: linear-gradient(135deg, #dbeafe, #eff6ff); display: flex; align-items: center; justify-content: center; font-size: 40px; position: relative; }
+  .prop-status { position: absolute; top: 10px; right: 10px; font-size: 10px; font-weight: 700; padding: 3px 8px; border-radius: 99px; }
+  .prop-status.available { background: #dcfce7; color: #15803d; }
+  .prop-status.reserved { background: #fef3c7; color: #a16207; }
+  .prop-status.sold { background: #fee2e2; color: #b91c1c; }
+  .prop-code { position: absolute; top: 10px; left: 10px; background: rgba(0,0,0,0.5); color: #fff; font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 4px; }
+  .prop-body { padding: 14px; }
+  .prop-title { font-size: 13px; font-weight: 700; color: #0f172a; margin-bottom: 4px; }
+  .prop-address { font-size: 11px; color: #64748b; margin-bottom: 10px; }
+  .prop-details { display: flex; gap: 12px; margin-bottom: 12px; }
+  .prop-detail { font-size: 11px; color: #475569; display: flex; align-items: center; gap: 3px; }
+  .prop-footer { display: flex; align-items: center; justify-content: space-between; padding-top: 10px; border-top: 1px solid #f1f5f9; }
+  .prop-price { font-size: 15px; font-weight: 800; color: #1e3a8a; }
+  .prop-type { font-size: 10px; color: #64748b; background: #f1f5f9; padding: 2px 8px; border-radius: 4px; }
+</style>
+</head>
+<body>
+
+<!-- SWITCHER -->
+<div class="switcher">
+  <span class="switcher-label">Pantallas</span>
+  <button class="sw-btn active" onclick="show('landing', this)">🌐 Landing Page</button>
+  <button class="sw-btn" onclick="show('dashboard', this)">📊 Dashboard</button>
+  <button class="sw-btn" onclick="show('kanban', this)">🗂 Pipeline Kanban</button>
+  <button class="sw-btn" onclick="show('propiedades', this)">🏠 Propiedades</button>
+</div>
+
+<!-- ════════════════════════════════════════
+     SCREEN 1 — LANDING PAGE
+════════════════════════════════════════ -->
+<div class="screen active" id="screen-landing">
+
+  <nav class="lp-nav">
+    <div class="lp-logo">CRM<span>Mobiliaria</span></div>
+    <div class="lp-nav-links">
+      <a href="#">Funcionalidades</a>
+      <a href="#">Precios</a>
+      <a href="#">Casos de éxito</a>
+      <a href="#">Blog</a>
+    </div>
+    <div class="lp-nav-cta">
+      <button class="btn-outline">Iniciar sesión</button>
+      <button class="btn-primary">Comenzar gratis</button>
+    </div>
+  </nav>
+
+  <div class="lp-hero">
+    <div class="lp-hero-badge">✦ El CRM inmobiliario que supera a Tokko Broker</div>
+    <h1>Gestiona tu inmobiliaria<br/>como <span>nunca antes</span></h1>
+    <p>Pipeline de operaciones, portal del comprador, cuotas y amortización. Todo en un solo lugar, diseñado para el mercado LATAM.</p>
+    <div class="lp-hero-btns">
+      <button class="btn-hero btn-hero-primary">Empezar gratis 14 días</button>
+      <button class="btn-hero btn-hero-secondary">Ver demo en vivo →</button>
+    </div>
+  </div>
+
+  <div class="lp-stats">
+    <div class="lp-stat"><div class="lp-stat-num">+500</div><div class="lp-stat-label">Inmobiliarias activas</div></div>
+    <div class="lp-stat"><div class="lp-stat-num">12.000</div><div class="lp-stat-label">Operaciones cerradas</div></div>
+    <div class="lp-stat"><div class="lp-stat-num">8 países</div><div class="lp-stat-label">de LATAM</div></div>
+    <div class="lp-stat"><div class="lp-stat-num">99.9%</div><div class="lp-stat-label">Uptime garantizado</div></div>
+  </div>
+
+  <div class="lp-features">
+    <div class="lp-section-title">Todo lo que necesitás para vender más</div>
+    <div class="lp-section-sub">Desde el primer contacto hasta el cobro de la última cuota</div>
+    <div class="lp-features-grid">
+      <div class="lp-feature-card">
+        <div class="lp-feature-icon">🗂</div>
+        <div class="lp-feature-title">Pipeline de Operaciones</div>
+        <div class="lp-feature-desc">Kanban visual para mover cada operación de prospecto a cierre. Nunca pierdas el hilo de un negocio.</div>
+      </div>
+      <div class="lp-feature-card">
+        <div class="lp-feature-icon">🏢</div>
+        <div class="lp-feature-title">Gestión de Propiedades</div>
+        <div class="lp-feature-desc">Inventario completo con fotos, características y publicación automática en +15 portales.</div>
+      </div>
+      <div class="lp-feature-card">
+        <div class="lp-feature-icon">💰</div>
+        <div class="lp-feature-title">Cuotas y Amortización</div>
+        <div class="lp-feature-desc">El único CRM de LATAM con módulo de cuotas post-venta. Tokko Broker no lo tiene.</div>
+      </div>
+      <div class="lp-feature-card">
+        <div class="lp-feature-icon">👤</div>
+        <div class="lp-feature-title">Portal del Comprador</div>
+        <div class="lp-feature-desc">Tu cliente ve sus cuotas, pagos y documentos desde su celular. Sin llamadas innecesarias.</div>
+      </div>
+      <div class="lp-feature-card">
+        <div class="lp-feature-icon">📅</div>
+        <div class="lp-feature-title">Agenda y Visitas</div>
+        <div class="lp-feature-desc">Programá visitas, llamadas y reuniones. Tu equipo nunca olvida un seguimiento.</div>
+      </div>
+      <div class="lp-feature-card">
+        <div class="lp-feature-icon">📊</div>
+        <div class="lp-feature-title">Reportes en Tiempo Real</div>
+        <div class="lp-feature-desc">Comisiones, rendimiento por agente, canales de captación. Todo medido y visible.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="lp-compare">
+    <div class="lp-section-title">¿Por qué no Tokko Broker?</div>
+    <div class="lp-section-sub">Compará y decidí</div>
+    <div class="lp-compare-table">
+      <table>
+        <thead>
+          <tr>
+            <th>Funcionalidad</th>
+            <th>CRM Mobiliaria</th>
+            <th>Tokko Broker</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>Pipeline de operaciones</td><td><span class="check">✓</span></td><td><span class="check">✓</span></td></tr>
+          <tr><td>Publicación en portales</td><td><span class="check">✓</span></td><td><span class="check">✓</span></td></tr>
+          <tr><td>Portal del comprador</td><td><span class="check">✓</span></td><td><span class="cross">✗</span></td></tr>
+          <tr><td>Módulo de cuotas</td><td><span class="check">✓</span></td><td><span class="cross">✗</span></td></tr>
+          <tr><td>Amortización francesa/alemana</td><td><span class="check">✓</span></td><td><span class="cross">✗</span></td></tr>
+          <tr><td>Contratos de alquiler</td><td><span class="check">✓</span></td><td><span class="cross">✗</span></td></tr>
+          <tr><td>Emprendimientos/desarrollos</td><td><span class="check">✓</span></td><td><span class="check">✓</span></td></tr>
+          <tr><td>Seguridad RLS nativa</td><td><span class="check">✓</span></td><td><span class="cross">✗</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="lp-pricing">
+    <div class="lp-section-title">Planes simples, sin sorpresas</div>
+    <div class="lp-section-sub">Todos los planes incluyen acceso completo a las funcionalidades</div>
+    <div class="lp-pricing-grid">
+      <div class="lp-plan">
+        <div class="lp-plan-name">Starter</div>
+        <div class="lp-plan-price">USD 49<span>/mes</span></div>
+        <ul class="lp-plan-features">
+          <li>Hasta 3 usuarios</li>
+          <li>100 propiedades</li>
+          <li>Pipeline ilimitado</li>
+          <li>Soporte por email</li>
+        </ul>
+        <button class="btn-outline" style="width:100%">Comenzar</button>
+      </div>
+      <div class="lp-plan featured">
+        <div class="lp-plan-badge">Más popular</div>
+        <div class="lp-plan-name">Pro</div>
+        <div class="lp-plan-price">USD 99<span>/mes</span></div>
+        <ul class="lp-plan-features">
+          <li>Hasta 10 usuarios</li>
+          <li>Propiedades ilimitadas</li>
+          <li>Módulo de cuotas</li>
+          <li>Portal del comprador</li>
+          <li>Soporte prioritario</li>
+        </ul>
+        <button class="btn-primary" style="width:100%">Comenzar</button>
+      </div>
+      <div class="lp-plan">
+        <div class="lp-plan-name">Enterprise</div>
+        <div class="lp-plan-price">USD 199<span>/mes</span></div>
+        <ul class="lp-plan-features">
+          <li>Usuarios ilimitados</li>
+          <li>Multi-sucursal</li>
+          <li>API personalizada</li>
+          <li>Gerente de cuenta</li>
+        </ul>
+        <button class="btn-outline" style="width:100%">Contactar</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ════════════════════════════════════════
+     SCREEN 2 — DASHBOARD
+════════════════════════════════════════ -->
+<div class="screen" id="screen-dashboard">
+  <div class="crm-layout">
+    <aside class="crm-sidebar">
+      <div class="crm-logo">CRM<span>Mob.</span></div>
+      <div class="nav-section">Principal</div>
+      <div class="nav-item active"><span class="icon">📊</span> Dashboard</div>
+      <div class="nav-item"><span class="icon">🗂</span> Operaciones <span class="nav-badge">8</span></div>
+      <div class="nav-item"><span class="icon">👥</span> Contactos</div>
+      <div class="nav-item"><span class="icon">🏠</span> Propiedades</div>
+      <div class="nav-section">Gestión</div>
+      <div class="nav-item"><span class="icon">📅</span> Agenda</div>
+      <div class="nav-item"><span class="icon">🏢</span> Emprendimientos</div>
+      <div class="nav-item"><span class="icon">📝</span> Tasaciones</div>
+      <div class="nav-item"><span class="icon">🔑</span> Alquileres</div>
+      <div class="nav-section">Reportes</div>
+      <div class="nav-item"><span class="icon">💰</span> Comisiones</div>
+      <div class="nav-item"><span class="icon">📈</span> Estadísticas</div>
+      <div class="nav-section">Config.</div>
+      <div class="nav-item"><span class="icon">⚙️</span> Configuración</div>
+    </aside>
+    <main class="crm-main">
+      <div class="crm-topbar">
+        <div>
+          <div class="crm-page-title">Dashboard</div>
+          <div class="crm-page-sub">Miércoles, 1 de julio de 2026</div>
+        </div>
+        <div class="crm-topbar-right">
+          <button class="btn-primary">+ Nueva operación</button>
+          <div class="topbar-avatar">JG</div>
+        </div>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start">
+            <div class="stat-card-label">Operaciones activas</div>
+            <div class="stat-card-icon" style="background:#eff6ff">🗂</div>
+          </div>
+          <div class="stat-card-value">24</div>
+          <div class="stat-card-change up">▲ +3 esta semana</div>
+        </div>
+        <div class="stat-card">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start">
+            <div class="stat-card-label">Propiedades</div>
+            <div class="stat-card-icon" style="background:#f0fdf4">🏠</div>
+          </div>
+          <div class="stat-card-value">87</div>
+          <div class="stat-card-change up">▲ +5 este mes</div>
+        </div>
+        <div class="stat-card">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start">
+            <div class="stat-card-label">Contactos</div>
+            <div class="stat-card-icon" style="background:#fefce8">👥</div>
+          </div>
+          <div class="stat-card-value">312</div>
+          <div class="stat-card-change up">▲ +18 este mes</div>
+        </div>
+        <div class="stat-card">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start">
+            <div class="stat-card-label">Cierres del mes</div>
+            <div class="stat-card-icon" style="background:#fdf4ff">💰</div>
+          </div>
+          <div class="stat-card-value">6</div>
+          <div class="stat-card-change up">▲ +2 vs mes anterior</div>
+        </div>
+      </div>
+
+      <div class="dashboard-grid">
+        <div>
+          <div class="card" style="margin-bottom:16px">
+            <div class="card-title">Estado del pipeline <span class="card-title-link">Ver Kanban →</span></div>
+            <div class="pipeline-mini">
+              <div class="pipeline-stage-mini"><div class="psm-label">Prospecto</div><div class="psm-count">7</div><div class="psm-value">USD 1.2M</div></div>
+              <div class="pipeline-stage-mini"><div class="psm-label">Interesado</div><div class="psm-count">5</div><div class="psm-value">USD 980K</div></div>
+              <div class="pipeline-stage-mini"><div class="psm-label">Negociando</div><div class="psm-count">4</div><div class="psm-value">USD 760K</div></div>
+              <div class="pipeline-stage-mini"><div class="psm-label">Cierre</div><div class="psm-count">3</div><div class="psm-value">USD 540K</div></div>
+              <div class="pipeline-stage-mini"><div class="psm-label">Vendido</div><div class="psm-count">5</div><div class="psm-value">USD 890K</div></div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-title">Operaciones recientes <span class="card-title-link">Ver todas →</span></div>
+            <div class="op-list-item">
+              <div class="op-avatar">JG</div>
+              <div class="op-info"><div class="op-name">Juan García</div><div class="op-prop">Depto Palermo · APT-001</div></div>
+              <div style="text-align:right"><div class="op-price">USD 180.000</div><div style="margin-top:4px"><span class="stage-badge stage-interesado">Interesado</span></div></div>
+            </div>
+            <div class="op-list-item">
+              <div class="op-avatar">ML</div>
+              <div class="op-info"><div class="op-name">María López</div><div class="op-prop">Casa Belgrano · CASA-001</div></div>
+              <div style="text-align:right"><div class="op-price">USD 310.000</div><div style="margin-top:4px"><span class="stage-badge stage-negociando">Negociando</span></div></div>
+            </div>
+            <div class="op-list-item">
+              <div class="op-avatar">CR</div>
+              <div class="op-info"><div class="op-name">Carlos Rodríguez</div><div class="op-prop">Depto Villa Urquiza · APT-002</div></div>
+              <div style="text-align:right"><div class="op-price">USD 148.000</div><div style="margin-top:4px"><span class="stage-badge stage-vendido">Vendido</span></div></div>
+            </div>
+            <div class="op-list-item">
+              <div class="op-avatar">SP</div>
+              <div class="op-info"><div class="op-name">Sofía Pérez</div><div class="op-prop">PH Recoleta · APT-003</div></div>
+              <div style="text-align:right"><div class="op-price">USD 420.000</div><div style="margin-top:4px"><span class="stage-badge stage-prospecto">Prospecto</span></div></div>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <div class="card" style="margin-bottom:16px">
+            <div class="card-title">Actividad reciente</div>
+            <div class="activity-item"><div class="activity-dot green"></div><div><div class="activity-text">Carlos Rodríguez cerró operación por USD 148.000</div><div class="activity-time">Hace 2 horas</div></div></div>
+            <div class="activity-item"><div class="activity-dot"></div><div><div class="activity-text">Nueva consulta de María López — Casa Belgrano</div><div class="activity-time">Hace 4 horas</div></div></div>
+            <div class="activity-item"><div class="activity-dot amber"></div><div><div class="activity-text">Visita programada con Juan García — mañana 10am</div><div class="activity-time">Hace 5 horas</div></div></div>
+            <div class="activity-item"><div class="activity-dot"></div><div><div class="activity-text">3 propiedades sincronizadas con ZonaProp</div><div class="activity-time">Hace 6 horas</div></div></div>
+            <div class="activity-item"><div class="activity-dot green"></div><div><div class="activity-text">Nuevo lead desde Facebook Ads — Roberto Silva</div><div class="activity-time">Hace 8 horas</div></div></div>
+          </div>
+
+          <div class="card">
+            <div class="card-title">Agenda hoy</div>
+            <div class="activity-item"><div class="activity-dot" style="background:#8b5cf6"></div><div><div class="activity-text">10:00 — Visita Depto Palermo con Juan García</div><div class="activity-time">APT-001 · Agente: Luis M.</div></div></div>
+            <div class="activity-item"><div class="activity-dot" style="background:#8b5cf6"></div><div><div class="activity-text">14:30 — Llamada de seguimiento a María López</div><div class="activity-time">Operación negociando</div></div></div>
+            <div class="activity-item"><div class="activity-dot" style="background:#8b5cf6"></div><div><div class="activity-text">16:00 — Reunión cierre Casa Belgrano</div><div class="activity-time">Escrituración</div></div></div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════
+     SCREEN 3 — KANBAN
+════════════════════════════════════════ -->
+<div class="screen" id="screen-kanban">
+  <div class="crm-layout">
+    <aside class="crm-sidebar">
+      <div class="crm-logo">CRM<span>Mob.</span></div>
+      <div class="nav-section">Principal</div>
+      <div class="nav-item"><span class="icon">📊</span> Dashboard</div>
+      <div class="nav-item active"><span class="icon">🗂</span> Operaciones <span class="nav-badge">8</span></div>
+      <div class="nav-item"><span class="icon">👥</span> Contactos</div>
+      <div class="nav-item"><span class="icon">🏠</span> Propiedades</div>
+      <div class="nav-section">Gestión</div>
+      <div class="nav-item"><span class="icon">📅</span> Agenda</div>
+      <div class="nav-item"><span class="icon">🏢</span> Emprendimientos</div>
+      <div class="nav-item"><span class="icon">📝</span> Tasaciones</div>
+      <div class="nav-item"><span class="icon">🔑</span> Alquileres</div>
+    </aside>
+    <main style="flex:1;overflow:hidden">
+      <div class="kanban-bar">
+        <div class="kanban-title">Operaciones</div>
+        <select class="kanban-filter"><option>Todos los agentes</option></select>
+        <select class="kanban-filter"><option>Todos los tipos</option></select>
+        <input class="kanban-filter" placeholder="🔍 Buscar operación..." style="min-width:200px"/>
+        <button class="kanban-btn">+ Nueva operación</button>
+      </div>
+      <div class="kanban-board">
+
+        <div class="kanban-col">
+          <div class="kanban-col-header"><div class="kanban-col-dot" style="background:#94a3b8"></div><div class="kanban-col-name">Prospecto</div><div class="kanban-col-count">4</div></div>
+          <div class="kanban-card"><div class="kanban-card-title">Roberto Silva</div><div class="kanban-card-prop">🏠 PH Recoleta · APT-003</div><div class="kanban-card-footer"><div class="kanban-card-price">USD 420K</div><div class="kanban-card-agent">LM</div></div><div class="kanban-card-days">⏱ Hace 1 día</div></div>
+          <div class="kanban-card"><div class="kanban-card-title">Ana Gómez</div><div class="kanban-card-prop">🏠 Casa Palermo · CASA-003</div><div class="kanban-card-footer"><div class="kanban-card-price">USD 285K</div><div class="kanban-card-agent">JG</div></div><div class="kanban-card-days">⏱ Hace 3 días</div></div>
+          <div class="kanban-card"><div class="kanban-card-title">Pedro Morales</div><div class="kanban-card-prop">🏠 Local Comercial · LOC-001</div><div class="kanban-card-footer"><div class="kanban-card-price">USD 195K</div><div class="kanban-card-agent">CM</div></div><div class="kanban-card-days">⏱ Hace 5 días</div></div>
+        </div>
+
+        <div class="kanban-col">
+          <div class="kanban-col-header"><div class="kanban-col-dot" style="background:#3b82f6"></div><div class="kanban-col-name">Interesado</div><div class="kanban-col-count">3</div></div>
+          <div class="kanban-card"><div class="kanban-card-title">Juan García</div><div class="kanban-card-prop">🏠 Depto Palermo · APT-001</div><div class="kanban-card-footer"><div class="kanban-card-price">USD 180K</div><div class="kanban-card-agent">LM</div></div><div class="kanban-card-days">⏱ Hace 2 días</div></div>
+          <div class="kanban-card"><div class="kanban-card-title">Lucía Fernández</div><div class="kanban-card-prop">🏠 Depto Núñez · APT-005</div><div class="kanban-card-footer"><div class="kanban-card-price">USD 145K</div><div class="kanban-card-agent">JG</div></div><div class="kanban-card-days">⏱ Hace 4 días</div></div>
+        </div>
+
+        <div class="kanban-col">
+          <div class="kanban-col-header"><div class="kanban-col-dot" style="background:#f59e0b"></div><div class="kanban-col-name">Negociando</div><div class="kanban-col-count">3</div></div>
+          <div class="kanban-card"><div class="kanban-card-title">María López</div><div class="kanban-card-prop">🏠 Casa Belgrano · CASA-001</div><div class="kanban-card-footer"><div class="kanban-card-price">USD 310K</div><div class="kanban-card-agent">CM</div></div><div class="kanban-card-days">⏱ Hace 6 días</div></div>
+          <div class="kanban-card"><div class="kanban-card-title">Diego Ríos</div><div class="kanban-card-prop">🏠 Duplex Caballito · DUP-001</div><div class="kanban-card-footer"><div class="kanban-card-price">USD 220K</div><div class="kanban-card-agent">LM</div></div><div class="kanban-card-days">⏱ Hace 8 días</div></div>
+        </div>
+
+        <div class="kanban-col">
+          <div class="kanban-col-header"><div class="kanban-col-dot" style="background:#8b5cf6"></div><div class="kanban-col-name">Cierre</div><div class="kanban-col-count">2</div></div>
+          <div class="kanban-card"><div class="kanban-card-title">Valeria Torres</div><div class="kanban-card-prop">🏠 Casa San Isidro · CASA-005</div><div class="kanban-card-footer"><div class="kanban-card-price">USD 380K</div><div class="kanban-card-agent">JG</div></div><div class="kanban-card-days">⏱ Hace 10 días</div></div>
+        </div>
+
+        <div class="kanban-col">
+          <div class="kanban-col-header"><div class="kanban-col-dot" style="background:#10b981"></div><div class="kanban-col-name">Vendido</div><div class="kanban-col-count">3</div></div>
+          <div class="kanban-card"><div class="kanban-card-title">Carlos Rodríguez</div><div class="kanban-card-prop">🏠 Depto Villa Urquiza · APT-002</div><div class="kanban-card-footer"><div class="kanban-card-price">USD 148K</div><div class="kanban-card-agent">CM</div></div><div class="kanban-card-days">✅ Cerrado 15 ene</div></div>
+          <div class="kanban-card"><div class="kanban-card-title">Hernán Blanco</div><div class="kanban-card-prop">🏠 Depto Almagro · APT-004</div><div class="kanban-card-footer"><div class="kanban-card-price">USD 112K</div><div class="kanban-card-agent">LM</div></div><div class="kanban-card-days">✅ Cerrado 3 ene</div></div>
+        </div>
+
+        <div class="kanban-col">
+          <div class="kanban-col-header"><div class="kanban-col-dot" style="background:#ef4444"></div><div class="kanban-col-name">Perdido</div><div class="kanban-col-count">2</div></div>
+          <div class="kanban-card" style="opacity:0.6"><div class="kanban-card-title">Marco Suárez</div><div class="kanban-card-prop">🏠 Casa Flores · CASA-004</div><div class="kanban-card-footer"><div class="kanban-card-price">USD 165K</div><div class="kanban-card-agent">JG</div></div><div class="kanban-card-days">❌ Compró con otro</div></div>
+        </div>
+
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════
+     SCREEN 4 — PROPIEDADES
+════════════════════════════════════════ -->
+<div class="screen" id="screen-propiedades">
+  <div class="crm-layout">
+    <aside class="crm-sidebar">
+      <div class="crm-logo">CRM<span>Mob.</span></div>
+      <div class="nav-section">Principal</div>
+      <div class="nav-item"><span class="icon">📊</span> Dashboard</div>
+      <div class="nav-item"><span class="icon">🗂</span> Operaciones</div>
+      <div class="nav-item"><span class="icon">👥</span> Contactos</div>
+      <div class="nav-item active"><span class="icon">🏠</span> Propiedades</div>
+      <div class="nav-section">Gestión</div>
+      <div class="nav-item"><span class="icon">📅</span> Agenda</div>
+      <div class="nav-item"><span class="icon">🏢</span> Emprendimientos</div>
+      <div class="nav-item"><span class="icon">📝</span> Tasaciones</div>
+      <div class="nav-item"><span class="icon">🔑</span> Alquileres</div>
+    </aside>
+    <main style="flex:1;overflow-y:auto">
+      <div class="props-bar">
+        <div class="props-title">Propiedades</div>
+        <input class="props-search" placeholder="🔍 Buscar por código, dirección o barrio..."/>
+        <select class="props-filter"><option>Todos los tipos</option><option>Departamento</option><option>Casa</option><option>Terreno</option></select>
+        <select class="props-filter"><option>Todos los estados</option><option>Disponible</option><option>Reservada</option><option>Vendida</option></select>
+        <select class="props-filter"><option>Todas las operaciones</option><option>Venta</option><option>Alquiler</option></select>
+        <button class="props-btn">+ Nueva propiedad</button>
+      </div>
+      <div class="props-grid">
+
+        <div class="prop-card">
+          <div class="prop-img">🏢<span class="prop-code">APT-001</span><span class="prop-status available">Disponible</span></div>
+          <div class="prop-body">
+            <div class="prop-title">Departamento 3 ambientes en Palermo</div>
+            <div class="prop-address">📍 Av. Santa Fe 3100, CABA</div>
+            <div class="prop-details">
+              <div class="prop-detail">📐 85m²</div>
+              <div class="prop-detail">🛏 2 dorm.</div>
+              <div class="prop-detail">🚿 1 baño</div>
+            </div>
+            <div class="prop-footer">
+              <div class="prop-price">USD 185.000</div>
+              <div class="prop-type">Venta</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="prop-card">
+          <div class="prop-img">🏠<span class="prop-code">CASA-001</span><span class="prop-status reserved">Reservada</span></div>
+          <div class="prop-body">
+            <div class="prop-title">Casa 4 ambientes en Belgrano</div>
+            <div class="prop-address">📍 Av. Cabildo 2500, CABA</div>
+            <div class="prop-details">
+              <div class="prop-detail">📐 200m²</div>
+              <div class="prop-detail">🛏 3 dorm.</div>
+              <div class="prop-detail">🚿 2 baños</div>
+            </div>
+            <div class="prop-footer">
+              <div class="prop-price">USD 320.000</div>
+              <div class="prop-type">Venta</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="prop-card">
+          <div class="prop-img">🏢<span class="prop-code">APT-002</span><span class="prop-status sold">Vendida</span></div>
+          <div class="prop-body">
+            <div class="prop-title">Departamento 2 ambientes en Villa Urquiza</div>
+            <div class="prop-address">📍 Av. Forest 1200, CABA</div>
+            <div class="prop-details">
+              <div class="prop-detail">📐 52m²</div>
+              <div class="prop-detail">🛏 1 dorm.</div>
+              <div class="prop-detail">🚿 1 baño</div>
+            </div>
+            <div class="prop-footer">
+              <div class="prop-price">ARS 150.000</div>
+              <div class="prop-type">Alquiler</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="prop-card">
+          <div class="prop-img">🏙<span class="prop-code">PH-001</span><span class="prop-status available">Disponible</span></div>
+          <div class="prop-body">
+            <div class="prop-title">PH 4 ambientes en Recoleta</div>
+            <div class="prop-address">📍 Av. Callao 1800, CABA</div>
+            <div class="prop-details">
+              <div class="prop-detail">📐 180m²</div>
+              <div class="prop-detail">🛏 3 dorm.</div>
+              <div class="prop-detail">🚿 2 baños</div>
+            </div>
+            <div class="prop-footer">
+              <div class="prop-price">USD 420.000</div>
+              <div class="prop-type">Venta</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="prop-card">
+          <div class="prop-img">🏗<span class="prop-code">LAND-001</span><span class="prop-status available">Disponible</span></div>
+          <div class="prop-body">
+            <div class="prop-title">Terreno en Tigre</div>
+            <div class="prop-address">📍 Ruta 27 km 4, Tigre, GBA</div>
+            <div class="prop-details">
+              <div class="prop-detail">📐 600m²</div>
+              <div class="prop-detail">🌳 Zona R2</div>
+            </div>
+            <div class="prop-footer">
+              <div class="prop-price">USD 95.000</div>
+              <div class="prop-type">Venta</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="prop-card">
+          <div class="prop-img">🏬<span class="prop-code">LOC-001</span><span class="prop-status available">Disponible</span></div>
+          <div class="prop-body">
+            <div class="prop-title">Local Comercial en Microcentro</div>
+            <div class="prop-address">📍 Florida 850, CABA</div>
+            <div class="prop-details">
+              <div class="prop-detail">📐 120m²</div>
+              <div class="prop-detail">🏪 Planta baja</div>
+            </div>
+            <div class="prop-footer">
+              <div class="prop-price">USD 195.000</div>
+              <div class="prop-type">Venta</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </main>
+  </div>
+</div>
+
+<script>
+  function show(name, btn) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.sw-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('screen-' + name).classList.add('active');
+    btn.classList.add('active');
+  }
+</script>
+</body>
+</html>

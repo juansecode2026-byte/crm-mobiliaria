@@ -22,7 +22,7 @@ CREATE TYPE public.commission_status AS ENUM (
 CREATE TABLE public.commission_payments (
     id                  UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     organization_id     UUID NOT NULL REFERENCES public.organizations(id) ON DELETE RESTRICT,
-    sale_id             UUID NOT NULL REFERENCES public.sales(id) ON DELETE RESTRICT,
+    operation_id        UUID NOT NULL REFERENCES public.operations(id) ON DELETE RESTRICT,
     agent_id            UUID NOT NULL REFERENCES public.profiles(id) ON DELETE RESTRICT,
     role                public.commission_role NOT NULL DEFAULT 'seller',
     percentage          NUMERIC(5,2) NOT NULL,
@@ -37,7 +37,7 @@ CREATE TABLE public.commission_payments (
 );
 
 CREATE INDEX idx_commission_payments_org ON public.commission_payments (organization_id);
-CREATE INDEX idx_commission_payments_sale ON public.commission_payments (sale_id);
+CREATE INDEX idx_commission_payments_operation ON public.commission_payments (operation_id);
 CREATE INDEX idx_commission_payments_agent ON public.commission_payments (agent_id, status);
 CREATE INDEX idx_commission_payments_status ON public.commission_payments (organization_id, status);
 
