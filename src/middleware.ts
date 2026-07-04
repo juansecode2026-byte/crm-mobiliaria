@@ -1,12 +1,22 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
+function getRoleFromJWT(accessToken: string): string | undefined {
+  try {
+    const payload = JSON.parse(atob(accessToken.split('.')[1]))
+    return payload.user_role as string | undefined
+  } catch {
+    return undefined
+  }
+}
+
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
 
   // Public routes — skip Supabase entirely for fast response
-  const publicRoutes = ['/', '/login', '/portal/login']
-  if (publicRoutes.some(route => pathname === route)) {
+  // /auth/callback must be public so Supabase can exchange the PKCE code
+  const publicRoutes = ['/', '/login', '/portal', '/auth/callback', '/reset-password']
+  if (publicRoutes.some(route => pathname === route || pathname.startsWith('/auth/'))) {
     return NextResponse.next({ request })
   }
 
@@ -31,29 +41,33 @@ export async function middleware(request: NextRequest) {
     }
   )
 
+  // Validate session (network call — checks JWT against Supabase)
   const { data: { user } } = await supabase.auth.getUser()
 
-  // Not logged in — redirect to login
   if (!user) {
     const url = request.nextUrl.clone()
     url.pathname = '/login'
     return NextResponse.redirect(url)
   }
 
-  // Get user role from JWT claims
-  const role = user.app_metadata?.user_role as string | undefined
+  // Read role from JWT custom claims (fn_custom_jwt_claims hook)
+  // getSession() reads the cookie locally — no extra network call
+  const { data: { session } } = await supabase.auth.getSession()
+  const role = session?.access_token
+    ? getRoleFromJWT(session.access_token)
+    : undefined
 
-  // Buyer tries to access CRM routes
-  if (role === 'buyer' && pathname.startsWith('/crm')) {
+  // Buyer tries to access CRM routes → buyer portal
+  if (role === 'buyer' && !pathname.startsWith('/mis-cuotas')) {
     const url = request.nextUrl.clone()
-    url.pathname = '/portal/mis-cuotas'
+    url.pathname = '/mis-cuotas'
     return NextResponse.redirect(url)
   }
 
-  // CRM user tries to access buyer portal routes
-  if (role && role !== 'buyer' && pathname.startsWith('/portal')) {
+  // CRM user tries to access buyer portal → CRM dashboard
+  if (role && role !== 'buyer' && pathname.startsWith('/mis-cuotas')) {
     const url = request.nextUrl.clone()
-    url.pathname = '/crm/dashboard'
+    url.pathname = '/dashboard'
     return NextResponse.redirect(url)
   }
 

@@ -27,13 +27,17 @@ export default function LoginPage() {
       return
     }
 
-    // Redirect based on role in JWT app_metadata
-    const role = data.user?.app_metadata?.user_role as string | undefined
+    // Role comes from JWT custom claims (fn_custom_jwt_claims hook), not app_metadata
+    let role: string | undefined
+    try {
+      const payload = JSON.parse(atob(data.session!.access_token.split('.')[1]))
+      role = payload.user_role
+    } catch { /* role stays undefined */ }
 
     if (role === 'buyer') {
-      router.push('/portal/mis-cuotas')
+      router.push('/mis-cuotas')
     } else {
-      router.push('/crm/dashboard')
+      router.push('/dashboard')
     }
 
     router.refresh()
@@ -46,7 +50,7 @@ export default function LoginPage() {
     }
     setLoading(true)
     await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${window.location.origin}/reset-password`,
+      redirectTo: `${window.location.origin}/auth/callback?next=/reset-password`,
     })
     setError(null)
     alert(`Email de recuperación enviado a ${email}`)
@@ -146,7 +150,7 @@ export default function LoginPage() {
               </div>
             </div>
             <Link
-              href="/portal/login"
+              href="/portal"
               className="inline-block mt-4 text-sm text-blue-600 hover:text-blue-800 font-medium transition-colors"
             >
               Accedé al portal de compradores →

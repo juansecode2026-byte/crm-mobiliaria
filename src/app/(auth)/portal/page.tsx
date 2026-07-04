@@ -27,13 +27,17 @@ export default function PortalLoginPage() {
       return
     }
 
-    const role = data.user?.app_metadata?.user_role as string | undefined
+    // Role comes from JWT custom claims (fn_custom_jwt_claims hook), not app_metadata
+    let role: string | undefined
+    try {
+      const payload = JSON.parse(atob(data.session!.access_token.split('.')[1]))
+      role = payload.user_role
+    } catch { /* role stays undefined */ }
 
     if (role !== 'buyer') {
-      // CRM user landed on buyer portal — redirect to CRM
-      router.push('/crm/dashboard')
+      router.push('/dashboard')
     } else {
-      router.push('/portal/mis-cuotas')
+      router.push('/mis-cuotas')
     }
 
     router.refresh()
@@ -46,7 +50,7 @@ export default function PortalLoginPage() {
     }
     setLoading(true)
     await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${window.location.origin}/reset-password`,
+      redirectTo: `${window.location.origin}/auth/callback?next=/reset-password`,
     })
     setError(null)
     alert(`Email de recuperación enviado a ${email}`)
